@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/a98ee9cbe5.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/jpeg" href="icon.png" sizes="17x17">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>AutoMail</title>
+</head>
+<body>
+    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="cont card1">
+            <h2 class="head1">Automated Mail Generate</h2>
+            <h3 class="head2">The Future Is Here</h3>
+            <div>
+                <div class="form__group field">
+                    <input type="input" class="form__field" name="fname" id='fname' required />
+                    <label for="fname" class="form__label">First Name</label>
+                </div>
+                <div class="form__group field">
+                    <input type="input" class="form__field" name="lname" id='lname' required />
+                    <label for="lname" class="form__label">Last Name</label>
+                </div>
+                <div class="form__group field">
+                    <input type="email" class="form__field" name="email" id='email' required />
+                    <label for="email" class="form__label">Email Address</label>
+                </div>
+                <div>
+                    <button class="proceed" id="myButton">Proceed</button>
+                </div>
+            </div>
+        </div>
+        <div class="cont2 card2">
+            <div>
+                <i class="fa-solid fa-arrow-left" id="back"></i>
+                <img src="mail.gif" alt="" class="mail">
+            </div>
+            <div class="mail_body">
+                <p class="head3" id="displayText"></p>
+            </div>
+            <div class="mail_footer d-flex p-2">
+                <div class="input-icons">
+                    <i class="fa fa-search icon" id="btn3"></i>
+                    <button class="regenerate" id="btn1"><i class="fa-solid fa-rotate-right"></i> Regenerate</button>
+                    <div class="dropdown" id="btn2">
+                        <button class="dropbtn"><i class="fa-solid fa-chevron-up"></i> Refine</button>
+                        <div class="dropdown-content">
+                          <button class="my_btn" id="elaborate"><i class="fa-solid fa-arrow-up-short-wide"></i> Elaborate</button>
+                          <button class="my_btn" id="short"><i class="fa-solid fa-arrow-down-short-wide"></i> Shorten</button>
+                        </div>
+                      </div>
+                    <input class="input-field" type="text" id="myInput">
+                </div>
+                <button class="send_btn" id="send"><i class="fa-solid fa-rocket"></i></button>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#btn1').hide();
+            $('#btn2').hide();
+          $('#myButton').click(function() {
+            var fname = $('#fname').val();
+            var lname = $('#lname').val();
+            var email = $('#email').val();
+            $('.card1').hide();
+            $('.card2').show();
+          });
+          $('.card2').hide(); 
+        });
+        $('#back').click(function() {
+        $('.card2').hide();
+        $('.card1').show();
+        });
+        function apiCall(value){
+            var fname = $('#fname').val();
+            var lname = $('#lname').val();
+            var email = $('#email').val();
+            const apiKey = "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";
+            const endpoint = 'https://api.openai.com/v1/completions';
+            const prompt = "my name is " +  fname + " " + lname + " and " + value;
+            const data = {
+                "model": "text-davinci-003",
+                "prompt": prompt,
+                "temperature": 0.7,
+                "max_tokens": 1000,
+                "top_p": 1,
+                "frequency_penalty": 0.5,
+                "presence_penalty": 0,
+            };
+            console.log(data);
+            let code = '';
+            $.ajax({
+                url: endpoint,
+                type: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${apiKey}`
+                },
+                data: JSON.stringify(data),
+                success: function(response) {
+                    const generatedCode = response.choices[0].text;
+                    $('#loading2').remove();
+                    $("#displayText").append(generatedCode);
+                    globalInput=generatedCode;
+                    // var words = generatedCode.split(" ");
+                    // var index = 0;
+                    // var displayInterval = null;
+                    // clearInterval(displayInterval);
+                    // displayInterval = setInterval(function() {
+                    // if (index < words.length) {
+                    //     $('#displayText').append(words[index] + " ");
+                    //     index++;
+                    // } else {
+                    //     clearInterval(displayInterval);
+                    // }
+                    // }, 100);
+                },
+                error: function(xhr, status, error) {
+                    $("#displayText").append('<p>Error!</p>');
+                }
+            });
+        }
+        var globalInput
+        $('#send').click(function() {
+            $("#displayText").empty();
+            $("#displayText").append('<h6 id="loading2" class="receive"><span class="spinner-grow spinner-grow-sm mr-1"></span><span class="spinner-grow spinner-grow-sm mr-1"></span><span class="spinner-grow spinner-grow-sm mr-1"></span></h6>');
+            var inputValue = $("#myInput").val();
+            $("#myInput").val("");
+            $('#btn1').show();
+            $('#btn2').show();
+            $('#btn3').hide();
+            apiCall(inputValue);
+            $('#myInput').prop('disabled', true);
+            $("#send").prop("disabled", true);
+          });
+          $("#myInput").keydown(function (event) { 
+            if (event.which == 13) { 
+                event.preventDefault();
+                $('#send').click();
+                $("#myInput").val("");
+            } 
+            });
+            $('#btn1').click(function() {
+                $("#displayText").empty();
+                $("#displayText").append('<h6 id="loading2" class="receive"><span class="spinner-grow spinner-grow-sm mr-1"></span><span class="spinner-grow spinner-grow-sm mr-1"></span><span class="spinner-grow spinner-grow-sm mr-1"></span></h6>');
+                apiCall(globalInput);
+            });
+            $('#elaborate').click(function() {
+                $("#displayText").empty();
+                $("#displayText").append('<h6 id="loading2" class="receive"><span class="spinner-grow spinner-grow-sm mr-1"></span><span class="spinner-grow spinner-grow-sm mr-1"></span><span class="spinner-grow spinner-grow-sm mr-1"></span></h6>');
+                apiCall("elaborate below mail and make it long => " + globalInput);
+            });
+            $('#short').click(function() {
+                $("#displayText").empty();
+                $("#displayText").append('<h6 id="loading2" class="receive"><span class="spinner-grow spinner-grow-sm mr-1"></span><span class="spinner-grow spinner-grow-sm mr-1"></span><span class="spinner-grow spinner-grow-sm mr-1"></span></h6>');
+                apiCall("shorten below mail and make it short => " + globalInput);
+            });
+      </script>
+</body>
+</html>
